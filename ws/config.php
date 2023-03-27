@@ -1,7 +1,7 @@
 <?php
-$username = 'root';
+$username = '';
 $password = '';
-$dbname = 'miReparto';
+$dbname = '';
 $servername = 'localHost';
 
 $conn = mysqli_connect($servername, $username, $password, $dbname);
