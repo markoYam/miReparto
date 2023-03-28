@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:orientation="vertical"
+    android:layout_height="60sp">
+    <TextView
+        android:id="@+id/numero"
+        android:layout_width="30sp"
+        android:layout_height="30sp"
+        android:layout_centerHorizontal="true"
+        android:text="1"
+        android:textAlignment="center"
+        android:background="@drawable/circle_gray"
+        android:layout_gravity="center_horizontal"
+        android:textStyle="bold"
+        android:paddingTop="2sp"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+    <ImageView
+        android:id="@+id/icono"
+        android:layout_width="30sp"
+        android:layout_height="35sp"
+        android:src="@drawable/house" />
+</LinearLayout>
