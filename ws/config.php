@@ -1,8 +1,9 @@
 <?php
 $username = 'root';
 $password = '';
-$dbname = 'miReparto';
-$servername = 'localHost';
+$dbname = '';
+$servername = 'localhost';
+
 
 $conn = mysqli_connect($servername, $username, $password, $dbname);
 if (!$conn) {
