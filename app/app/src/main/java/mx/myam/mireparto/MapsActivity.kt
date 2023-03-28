@@ -183,7 +183,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun actualizarMarkerParadas() {
-        val apiKey = "AIzaSyDLEdYk_QRPcaClwl1i6SXf54bTMZNK5mQ"
+        val apiKey = getString(R.string.api_key)
         val geoApiContext = GeoApiContext.Builder()
             .apiKey(apiKey)
             .build()
