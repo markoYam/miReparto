@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['idRuta'])) {
 }
 
 // Endpoint para actualizar una parada existente
-if ($_SERVER['REQUEST_METHOD'] == 'PUT' && isset($_GET['idParada'])) {
+if ($_SERVER['REQUEST_METHOD'] == 'PUT' && isset($_GET['idParada']) && isset($_GET['accion']) && $_GET['accion'] == 'actualizar') {
     parse_str(file_get_contents("php://input"), $post_vars);
     $idParada = $_GET['idParada'];
     $fecha = $post_vars['fecha'];
@@ -116,9 +116,9 @@ if ($result) {
 
 mysqli_close($conn);
 }
+//Endpoint para actualizar el estatus de una parada validar el accion == actualizarRuta
 
-//Endpoint para actualizar el estatus de una parada
-if ($_SERVER['REQUEST_METHOD'] == 'PUT' && isset($_GET['idParada']) && isset($_GET['idEstatus'])) {
+if ($_SERVER['REQUEST_METHOD'] == 'PUT' && isset($_GET['idParada']) && isset($_GET['accion']) && $_GET['accion'] == 'actualizarRutas'  && isset($_GET['idEstatus'])) {
     $idParada = $_GET['idParada'];
     $idEstatus = $_GET['idEstatus'];
 
