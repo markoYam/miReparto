@@ -14,9 +14,11 @@ class RutasController(val iRutasController: IRutasController) {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun getRutas() {
+        iRutasController.isLoading(true)
         GlobalScope.launch(Dispatchers.IO) {
             try {
                 val rutasResponse = ClientService.apiClient.getRutas().execute().body()
+                iRutasController.isLoading(false)
                 if (rutasResponse?.idEstatus == 1) {
                     iRutasController.onSuccesRutas(rutasResponse)
                 } else {
@@ -25,6 +27,8 @@ class RutasController(val iRutasController: IRutasController) {
                     )
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
+                iRutasController.isLoading(false)
                 iRutasController.onErrorRutas(e.message.toString())
             }
         }
@@ -33,9 +37,11 @@ class RutasController(val iRutasController: IRutasController) {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun getParadas(idRuta:Int){
+        iRutasController.isLoading(true)
         GlobalScope.launch(Dispatchers.IO) {
             try {
                 val paradasResponse = ClientService.apiClient.getParadas(idRuta).execute().body()
+                iRutasController.isLoading(false)
                 if (paradasResponse?.idEstatus == 1) {
                     iRutasController.onSuccesParadas(paradasResponse)
                 } else {
@@ -44,17 +50,20 @@ class RutasController(val iRutasController: IRutasController) {
                     )
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
+                iRutasController.isLoading(false)
                 iRutasController.onErrorParadas(e.message.toString())
             }
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun actualizarEntrega(idParada: Int, status: Int) {
+        iRutasController.isLoading(true)
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                val x = RequestBody.create(okhttp3.MultipartBody.FORM, idParada.toString())
-                val y = RequestBody.create(okhttp3.MultipartBody.FORM, status.toString())
                 val actualizarEntregaResponse = ClientService.apiClient.actualizarEntrega(idParada, status,"actualizarRutas").execute().body()
+                iRutasController.isLoading(false)
                 if (actualizarEntregaResponse?.idEstatus == 1) {
                     iRutasController.onSuccesActualizarEntrega(idParada, status)
                 } else {
@@ -63,6 +72,8 @@ class RutasController(val iRutasController: IRutasController) {
                     )
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
+                iRutasController.isLoading(false)
                 iRutasController.onErrorActualizarEntrega(e.message.toString())
             }
         }
@@ -81,4 +92,6 @@ interface IRutasController {
 
     fun onSuccesActualizarEntrega(idParada: Int, status: Int)
     fun onErrorActualizarEntrega(error: String)
+
+    fun isLoading(isLoading: Boolean)
 }

@@ -9,6 +9,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.http.GET
 import retrofit2.http.Multipart
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Query
@@ -20,6 +21,6 @@ interface ApiClient {
     @GET("paradas.php")
     fun getParadas(@Query("idRuta") idRuta:Int): Call<ParadasResponse>
 
-    @PUT("paradas.php")
+    @POST("paradas.php")
     fun actualizarEntrega(@Query("idParada") idParada: Int, @Query("idEstatus") idEstatus:Int,@Query("accion")accion:String): Call<BaseResponse>
 }

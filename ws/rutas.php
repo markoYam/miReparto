@@ -4,7 +4,7 @@ require_once('config.php');
 
 // Endpoint para obtener todas las ruteo
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-    $sql = "SELECT * FROM ruteo";
+    $sql = "SELECT * FROM Ruteo";
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) > 0) {
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //$idEstatus = $_POST['idEstatus'];
     //$idEstatus = 1;
 
-    $sql = "INSERT INTO ruteo (idRuteo, fecha, Repartidor) VALUES ('$idRuteo', '$fecha', '$Repartidor')";
+    $sql = "INSERT INTO Ruteo (fecha, Repartidor) VALUES ('$fecha', '$Repartidor')";
     echo $sql;
     $result = mysqli_query($conn, $sql);
 
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
     $fecha = $_POST['fecha'];
     $Repartidor = $_POST['Repartidor'];
 
-    $sql = "UPDATE ruteo SET idRuteo = '$idRuteo', fecha = '$fecha', Repartidor = '$Repartidor' WHERE idRuteo = $idRuteo";
+    $sql = "UPDATE Ruteo SET idRuteo = '$idRuteo', fecha = '$fecha', Repartidor = '$Repartidor' WHERE idRuteo = $idRuteo";
     $result = mysqli_query($conn, $sql);
 
     if ($result) {
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
 if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
     $idRuta = $_GET['idRuta'];
 
-    $sql = "DELETE FROM ruteo WHERE idRuteo = $idRuta";
+    $sql = "DELETE FROM Ruteo WHERE idRuteo = $idRuta";
     $result = mysqli_query($conn, $sql);
 
     if ($result) {

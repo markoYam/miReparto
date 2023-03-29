@@ -2,7 +2,6 @@ CREATE TABLE Ruteo (
     idRuteo INT NOT NULL AUTO_INCREMENT,
     fecha DATE NOT NULL,
     Repartidor VARCHAR(50) NOT NULL,
-    idRuta INT NOT NULL,
     PRIMARY KEY (idRuteo)
 );
 

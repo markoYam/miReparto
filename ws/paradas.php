@@ -29,18 +29,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['idRuta'])) {
 
     mysqli_close($conn);
 }
-
 // Endpoint para agregar una nueva parada
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['idRuta'])) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'create') {
+   
     $idRuta = $_POST['idRuta'];
     $fecha = $_POST['fecha'];
     $latitud = $_POST['latitud'];
     $longitud = $_POST['longitud'];
+    $idEstatus = $_POST['idEstatus'];
     $comentarios = $_POST['comentarios'];
     $total = $_POST['total'];
     $cliente = $_POST['cliente'];
 
-    $sql = "INSERT INTO Paradas (idRuta, fecha, idEstatus, latitud, longitud, comentarios, total, cliente) VALUES ($idRuta, '$fecha', 0, $latitud, $longitud, '$comentarios', $total, '$cliente')";
+    $sql = "INSERT INTO Paradas (idRuta, fecha, idEstatus, latitud, longitud, comentarios, total, cliente) VALUES ($idRuta, '$fecha', $idEstatus, $latitud, $longitud, '$comentarios', $total, '$cliente')";
     $result = mysqli_query($conn, $sql);
 
     if ($result) {
@@ -118,7 +119,7 @@ mysqli_close($conn);
 }
 //Endpoint para actualizar el estatus de una parada validar el accion == actualizarRuta
 
-if ($_SERVER['REQUEST_METHOD'] == 'PUT' && isset($_GET['idParada']) && isset($_GET['accion']) && $_GET['accion'] == 'actualizarRutas'  && isset($_GET['idEstatus'])) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['idParada']) && isset($_GET['accion']) && $_GET['accion'] == 'actualizarRutas'  && isset($_GET['idEstatus'])) {
     $idParada = $_GET['idParada'];
     $idEstatus = $_GET['idEstatus'];
 

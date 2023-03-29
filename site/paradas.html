@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Registro de Paradas</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLEdYk_QRPcaClwl1i6SXf54bTMZNK5mQ"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLEdYk_QRPcaClwl1i6SXf54bTMZNK5mQ&libraries=places"></script>
+
+        <meta charset="utf-8">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Nueva parada</h2>
+        <form id="miFormulario">
+
+            <div class="form-group">
+                <label for="idRuta">ID de ruta:</label>
+                <input type="text" class="form-control" id="idRuta" name="idRuta" value="1">
+            </div>
+            <div class="form-group">
+                <label for="fecha">Fecha:</label>
+                <input type="text" class="form-control" id="fecha" name="fecha">
+            </div>
+            <div class="form-group">
+                <label for="idEstatus">ID de estatus:</label>
+                <input type="text" class="form-control" id="idEstatus" name="idEstatus" value="1">
+            </div>
+            <div class="form-group">
+                <label for="map">Buscar ubicación:</label>
+                <input type="text" class="form-control" id="search-input"
+                placeholder="Escriba una dirección o lugar">
+            </div>
+
+            <div class="form-group">            
+                <label for="map">Ubicación:</label>
+                <div id="map" style="height: 300px;"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="latitud">Latitud:</label>
+                <input type="text" class="form-control" id="latitud" name="latitud" value="0">
+            </div>
+            <div class="form-group">
+                <label for="longitud">Longitud:</label>
+                <input type="text" class="form-control" id="longitud" name="longitud" , value="0">
+            </div>
+            <div class="form-group">
+                <label for="cliente">Cliente:</label>
+                <input type="text" class="form-control" id="cliente" name="cliente" required>
+            </div>
+            <div class="form-group">
+                <label for="comentarios">Comentarios:</label>
+                <textarea class="form-control" id="comentarios" name="comentarios"
+                    placeholder="Direccion - Articulos"> </textarea>
+            </div>
+            <div class="form-group">
+                <label for="total">Total:</label>
+                <input type="text" class="form-control" id="total" name="total" required>
+            </div>
+
+            <input type="hidden" name="action" value="create">
+
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+
+            //set fecha to current date to #fecha
+            // Obtener la fecha actual y formatearla en formato ISO
+            var fechaActual = new Date().toISOString().substr(0, 10);
+
+            // Establecer la fecha actual como valor por defecto del campo de fecha
+            $("input[name='fecha']").val(fechaActual);
+
+            $('#miFormulario').submit(function (event) {
+                event.preventDefault(); // Evita que el formulario se envíe por defecto
+
+                // Obtiene los valores de los campos del formulario
+                var idParada = $('#idParada').val();
+                var idRuta = $('#idRuta').val();
+                var fecha = $('#fecha').val();
+                var idEstatus = $('#idEstatus').val();
+                var latitud = $('#latitud').val();
+                var longitud = $('#longitud').val();
+                var comentarios = $('#comentarios').val();
+                var total = $('#total').val();
+                var cliente = $('#cliente').val();
+
+
+                // Envía los datos del formulario a paradas.php mediante Ajax
+                $.ajax({
+                    url: '../ws/paradas.php',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        console.log(response);
+                        // Coloca aquí el código que deseas ejecutar en caso de éxito
+                        alert(response["mensaje"]);
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                        // Coloca aquí el código que deseas ejecutar en caso de error
+                        alert("Error al registrar la parada");
+                    }
+                });
+            });
+
+            // Obtenemos la referencia al contenedor del mapa
+            var mapContainer = document.getElementById('map');
+
+            // Creamos un objeto LatLng con la ubicación del usuario
+            var userLocation = new google.maps.LatLng(20.2055611, -89.2852394);
+
+            // Configuramos las opciones del mapa
+            var mapOptions = {
+                zoom: 16,
+                center: userLocation
+            };
+
+            // Creamos el objeto de mapa
+            var map = new google.maps.Map(mapContainer, mapOptions);
+
+            // Creamos un marcador en la ubicación del usuario
+            var marker = new google.maps.Marker({
+                position: userLocation,
+                map: map,
+                draggable: true
+            });
+
+            // Actualizamos la latitud y longitud en los campos de formulario cuando se mueve el marcador
+            google.maps.event.addListener(marker, 'dragend', function () {
+                var position = marker.getPosition();
+                $('input[name="latitud"]').val(position.lat());
+                $('input[name="longitud"]').val(position.lng());
+            });
+
+
+            //nuevo
+            // Obtenemos la referencia al input de búsqueda
+            var searchInput = document.getElementById('search-input');
+
+            // Creamos un objeto de búsqueda de Places
+            var searchBox = new google.maps.places.SearchBox(searchInput);
+
+            // Vinculamos el objeto de búsqueda con el mapa
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchInput);
+
+            // Agregamos un evento cuando se selecciona una ubicación en el buscador
+            searchBox.addListener('places_changed', function () {
+                var places = searchBox.getPlaces();
+                if (places.length == 0) {
+                    return;
+                }
+
+                // Movemos el mapa a la ubicación seleccionada
+                var bounds = new google.maps.LatLngBounds();
+                places.forEach(function (place) {
+                    if (!place.geometry) {
+                        console.log("Ubicación sin coordenadas: " + place.name);
+                        return;
+                    }
+
+                    if (place.geometry.viewport) {
+                        bounds.union(place.geometry.viewport);
+                    } else {
+                        bounds.extend(place.geometry.location);
+                    }
+                });
+                map.fitBounds(bounds);
+
+                // Movemos el marcador a la ubicación seleccionada
+                var position = places[0].geometry.location;
+                marker.setPosition(position);
+                $('input[name="latitud"]').val(position.lat());
+                $('input[name="longitud"]').val(position.lng());
+            });
+
+        });
+    </script>
+</body>
