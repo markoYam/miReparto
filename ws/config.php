@@ -1,7 +1,7 @@
 <?php
 $username = 'root';
 $password = '';
-$dbname = 'mireparto';
+$dbname = '';
 $servername = 'localhost';
 
 
