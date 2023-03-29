@@ -1,5 +1,6 @@
 package mx.myam.mireparto
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -183,7 +184,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun actualizarMarkerParadas() {
-        val apiKey = "AIzaSyDLEdYk_QRPcaClwl1i6SXf54bTMZNK5mQ"
+        val apiKey = getString(R.string.api_key)
         val geoApiContext = GeoApiContext.Builder()
             .apiKey(apiKey)
             .build()
@@ -285,6 +286,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
                     }
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 Log.e("MainActivity", "Error al obtener la ruta: ${e.localizedMessage}")
             }
         }
@@ -434,8 +436,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
 
         val lsItems = rutas.data?.map { it.repartidor } ?: emptyList()
         val adapterSpinner = ArrayAdapter(this, android.R.layout.simple_spinner_item, lsItems)
-        adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerRutas.adapter = adapterSpinner
+
+        GlobalScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
+                adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.spinnerRutas.adapter = adapterSpinner
+            }
+        }
     }
 
     override fun onErrorRutas(error: String) {
@@ -507,6 +514,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
         }
 
     }
+
+    override fun isLoading(isLoading: Boolean) {
+        if(isLoading) {
+            showProgressDialog()
+        } else {
+            progressDialog?.dismiss()
+        }
+    }
+
+    private fun showProgressDialog() {
+        progressDialog = ProgressDialog(this)
+        progressDialog?.setMessage("Cargando... Por favor espere")
+        progressDialog?.setCancelable(false)
+        progressDialog?.show()
+    }
+
+    var progressDialog: ProgressDialog? = null
 
     fun clearDetail() {
         binding.relativeLayoutMarkerDetails.tag = null
