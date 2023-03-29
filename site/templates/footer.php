@@ -9,6 +9,8 @@
             </div>
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLEdYk_QRPcaClwl1i6SXf54bTMZNK5mQ"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLEdYk_QRPcaClwl1i6SXf54bTMZNK5mQ&libraries=places"></script>
         <script src="<?=URL_BASE?>site/assets/js/scripts.js"></script>
         
     </body>

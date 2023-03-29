@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $total = $_POST['total'];
     $cliente = $_POST['cliente'];
 
+
     $sql = "INSERT INTO Paradas (idRuta, fecha, idEstatus, latitud, longitud, comentarios, total, cliente) VALUES ($idRuta, '$fecha', $idEstatus, $latitud, $longitud, '$comentarios', $total, '$cliente')";
     $result = mysqli_query($conn, $sql);
 
