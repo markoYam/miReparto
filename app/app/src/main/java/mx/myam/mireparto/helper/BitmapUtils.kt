@@ -1,4 +1,4 @@
-package mx.myam.mireparto
+package mx.myam.mireparto.helper
 
 import android.graphics.Bitmap
 import android.graphics.Canvas

@@ -1,15 +1,14 @@
-package mx.myam.mireparto
+package mx.myam.mireparto.views
 
 import android.app.ProgressDialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -29,13 +28,17 @@ import com.google.maps.internal.PolylineEncoding
 import com.google.maps.model.LatLng
 import com.google.maps.model.TravelMode
 import kotlinx.coroutines.*
+import mx.myam.mireparto.helper.BitmapUtils
+import mx.myam.mireparto.R
 import mx.myam.mireparto.controllers.IRutasController
 import mx.myam.mireparto.controllers.RutasController
 import mx.myam.mireparto.databinding.ActivityMapsBinding
 import mx.myam.mireparto.models.Paradas
+import mx.myam.mireparto.models.RepartidorGps
 import mx.myam.mireparto.models.Rutas
 import mx.myam.mireparto.service.response.ParadasResponse
 import mx.myam.mireparto.service.response.RutasResponse
+import mx.myam.mireparto.views.fragment.ParadasRutaDialogFragment
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import kotlin.math.atan2
@@ -83,17 +86,32 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
             }
         }
 
-        binding.btnCancelar.setOnClickListener {
-            var idParada = binding.relativeLayoutMarkerDetails.tag.toString().toInt()
-            ctrl.actualizarEntrega(idParada, 3)
+        binding.chipCancelar.setOnClickListener {
+            val idParada = binding.relativeLayoutMarkerDetails.tag.toString().toInt()
+            ctrl.actualizarEntrega(idParada, 10)
         }
-        binding.btnEntregado.setOnClickListener {
-            var idParada = binding.relativeLayoutMarkerDetails.tag.toString().toInt()
-            ctrl.actualizarEntrega(idParada, 2)
+        binding.chipEntregado.setOnClickListener {
+            val idParada = binding.relativeLayoutMarkerDetails.tag.toString().toInt()
+            ctrl.actualizarEntrega(idParada, 9)
         }
-        binding.btnReagendar.setOnClickListener {
-            var idParada = binding.relativeLayoutMarkerDetails.tag.toString().toInt()
-            ctrl.actualizarEntrega(idParada, 1)
+        binding.chipReagendar.setOnClickListener {
+            val idParada = binding.relativeLayoutMarkerDetails.tag.toString().toInt()
+            ctrl.actualizarEntrega(idParada, 8)
+        }
+
+        binding.btnMenu.setOnClickListener {
+            ParadasRutaDialogFragment.newInstance().show(supportFragmentManager, "ParadasRutaDialogFragment")
+        }
+
+        binding.imgNavigate.setOnClickListener {
+            val idParada = binding.relativeLayoutMarkerDetails.tag.toString().toInt()
+            val parada = lsParadas.find { it.idParada == idParada }
+            if (parada != null) {
+                val uri = "google.navigation:q=${parada.latitud},${parada.longitud}"
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+                intent.setPackage("com.google.android.apps.maps")
+                startActivity(intent)
+            }
         }
 
     }
@@ -115,10 +133,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
         val numeroTextView = markerView.findViewById<TextView>(R.id.numero)
         numeroTextView.text = number
         when (status) {
-            1 -> {
+            8 -> {
                 numeroTextView.background = getDrawable(R.drawable.circle_gray)
             }
-            2 -> {
+            9 -> {
                 numeroTextView.background = getDrawable(R.drawable.circle_green)
             }
             else -> {
@@ -305,7 +323,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
         mMap = googleMap
         // getSha1()
         configureMap()
-        changeThemeMaps()
+        //changeThemeMaps()
         //mockData()
         requestPermissionLocation()
         mMap.setOnMarkerClickListener(object : GoogleMap.OnMarkerClickListener {
@@ -321,14 +339,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
                     return false
                 }
 
+
                 val parada = lsParadas.find { it.idParada == idParada }
                 if (parada != null) {
                     binding.relativeLayoutMarkerDetails.tag = idParada
                     binding.relativeLayoutMarkerDetails.visibility = View.VISIBLE
                     binding.textViewMarkerTitle.text =
                         "Parada #${parada.idParada} - ${parada.cliente}"
+
+                    val adapter: ArrayAdapter<*>
+
+                    val productos = parada.productos.map { "x${it.dcCantidad.toInt()} - ${it.nbProducto}" }.toMutableList()
+
+                    adapter = ArrayAdapter(
+                        this@MapsActivity,
+                        android.R.layout.simple_list_item_1,
+                        productos
+                    )
+                    binding.listViewMarkerProducts.adapter = adapter
                     binding.textViewMarkerDescription.text = parada.comentarios
-                    binding.textViewMarkerAddress.text = "$" + parada.total.toString()
+                    binding.textViewTotal.text = "$" + parada.productos.sumOf {x-> x.dcCantidad * x.dcPrecioVenta }.toString()
                 } else {
                     clearDetail()
                 }
@@ -379,12 +409,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
 
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val provider = LocationManager.GPS_PROVIDER
-        locationManager.requestLocationUpdates(provider, 0, 0f, locationListener)
+        locationManager.requestLocationUpdates(provider, 0, 5f, locationListener)
         val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
         if (location != null) {
             val latLng = LatLng(location.latitude, location.longitude)
             // Aquí irá el código para mostrar el icono
-            actualizarMarker(location)
+            updateMarkerLocation(location)
             //move camera
             val latLng2 =
                 com.google.android.gms.maps.model.LatLng(location.latitude, location.longitude)
@@ -395,11 +425,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
     private val locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             // Aquí irá el código para actualizar la ubicación en el mapa
-            actualizarMarker(location)
+            updateMarkerLocation(location)
         }
     }
 
-    fun actualizarMarker(location: Location) {
+    fun updateMarkerLocation(location: Location) {
         locationUser = location
         if (markerLocation != null) {
             markerLocation?.remove()
@@ -410,6 +440,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
 
         markerLocation?.position = latLng
         markerLocation?.rotation = location.bearing
+
+        val data = RepartidorGps()
+        data.idRepartidor = 1
+        data.latitud = location.latitude
+        data.longitud = location.longitude
+
+        //ctrl.registerLocationUser(data)
     }
 
     private var locationUser: Location? = null
@@ -434,7 +471,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
 
         lsRutas = rutas.data?.toMutableList() ?: mutableListOf()
 
-        val lsItems = rutas.data?.map { it.repartidor } ?: emptyList()
+        val lsItems = rutas.data?.map { it.folio } ?: emptyList()
         val adapterSpinner = ArrayAdapter(this, android.R.layout.simple_spinner_item, lsItems)
 
         GlobalScope.launch(Dispatchers.Main) {
@@ -537,6 +574,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, IRutasController {
         binding.relativeLayoutMarkerDetails.visibility = View.GONE
         binding.textViewMarkerTitle.text = ""
         binding.textViewMarkerDescription.text = ""
-        binding.textViewMarkerAddress.text = ""
+        binding.listViewMarkerProducts.adapter = null
+        binding.textViewTotal.text = ""
     }
 }

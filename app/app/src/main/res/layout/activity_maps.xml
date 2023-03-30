@@ -9,141 +9,262 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/relativeLayoutMarkerDetails"
-        tools:context=".MapsActivity" />
+        tools:context=".views.MapsActivity" />
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/relativeLayoutMarkerDetails"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/white"
-        android:minHeight="150sp"
-        android:orientation="vertical">
+        android:layout_margin="10sp"
+        android:visibility="visible">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/textViewMarkerTitle"
+        <LinearLayout
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10sp"
-            android:text="Titulo"
-            android:layout_marginLeft="10sp"
-            android:textColor="@android:color/black"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:layout_alignParentBottom="true"
+            android:background="@android:color/white"
+            android:minHeight="150sp"
+            android:orientation="vertical"
+            android:visibility="visible">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/textViewMarkerDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textViewMarkerTitle"
-            android:layout_marginLeft="10sp"
-            android:layout_marginTop="5sp"
-            android:layout_marginRight="10sp"
-            android:text="Descripcion"
-            android:textColor="@android:color/black"
-            android:textSize="20sp" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/textViewMarkerAddress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textViewMarkerDescription"
-            android:layout_marginLeft="10sp"
-            android:layout_marginTop="5sp"
-            android:layout_marginRight="10sp"
-            android:text="Direccion"
-            android:textColor="@android:color/black"
-            android:textSize="20sp" />
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/textViewMarkerTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_marginTop="10sp"
+                    android:layout_marginRight="5sp"
+                    android:layout_toStartOf="@+id/imgNavigate"
+                    android:text="Titulo"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textViewMarkerDescription"
-            android:layout_margin="10sp"
-            android:text="¿Entregado?"
-            android:textAlignment="center"
-            android:textColor="@android:color/black"
-            android:textSize="20sp" />
+                <ImageView
+                    android:id="@+id/imgNavigate"
+                    android:layout_width="40sp"
+                    android:layout_height="40sp"
+                    android:layout_alignParentRight="true"
+                    android:clickable="true"
+                    android:layout_marginTop="10sp"
+                    android:layout_marginRight="10sp"
+                    android:src="@drawable/googlemaps">
+
+                </ImageView>
+            </RelativeLayout>
+
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/textViewMarkerDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewMarkerTitle"
+                android:layout_marginLeft="10sp"
+                android:layout_marginTop="5sp"
+                android:layout_marginRight="10sp"
+                android:text="Descripcion"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <ListView
+                android:id="@+id/listViewMarkerProducts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </ListView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/textViewTotal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10sp"
+                android:layout_marginTop="5sp"
+                android:layout_marginRight="10sp"
+                android:text="Total"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewMarkerDescription"
+                android:layout_margin="10sp"
+                android:text="¿Entregado?"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <!-- create chips options style google maps app -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5sp"
+                android:layout_marginRight="5sp"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="80sp"
+                    android:layout_below="@+id/textViewMarkerAddress"
+                    android:layout_marginBottom="10sp"
+                    android:orientation="horizontal"
+                    app:chipSpacingHorizontal="0sp"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipEntregado"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60sp"
+                        android:layout_margin="5sp"
+                        android:background="@android:color/white"
+                        android:clickable="true"
+                        android:text="Entregado"
+                        android:textColor="@color/blueMaterial"
+                        android:textSize="15sp"
+                        app:iconStartPadding="5sp"
+                        app:chipBackgroundColor="@android:color/white"
+                        app:chipIcon="@drawable/comprobado"
+                        app:chipStrokeColor="@color/chip_stroke_color"
+                        app:chipStrokeWidth="1dp" />
+
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipCancelar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60sp"
+                        android:layout_margin="5sp"
+                        android:clickable="true"
+                        android:text="No Entregado"
+                        android:textColor="@color/blueMaterial"
+                        android:textSize="15sp"
+                        app:iconStartPadding="5sp"
+                        app:chipBackgroundColor="@android:color/white"
+                        app:chipIcon="@drawable/cancelar"
+                        app:chipStrokeColor="@color/chip_stroke_color"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipReagendar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60sp"
+                        android:layout_margin="5sp"
+                        android:clickable="true"
+                        android:text="Reagendar"
+                        android:textColor="@color/blueMaterial"
+                        android:textSize="15sp"
+                        app:iconStartPadding="5sp"
+                        app:chipBackgroundColor="@android:color/white"
+                        app:chipIcon="@drawable/intercambiar"
+                        app:chipStrokeColor="@color/chip_stroke_color"
+                        app:chipStrokeWidth="1dp" />
+
+
+                </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="80sp"
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:layout_marginBottom="10sp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/btnEntregado"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:clickable="true"
+                    android:padding="8sp"
+                    android:src="@drawable/comprobado" />
+
+                <ImageView
+                    android:id="@+id/btnCancelar"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:padding="8sp"
+                    android:src="@drawable/cancelar" />
+
+                <ImageView
+                    android:id="@+id/btnReagendar"
+                    android:layout_width="0sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:padding="8sp"
+                    android:src="@drawable/intercambiar" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5sp"
+        android:layout_marginTop="5sp"
+        android:layout_marginEnd="5sp"
+        android:layout_marginBottom="5sp"
+
+        app:cardElevation="2sp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true"
+        app:contentPadding="2sp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="80sp"
-            android:layout_marginLeft="10sp"
-            android:layout_marginRight="10sp"
-            android:layout_marginBottom="10sp">
-
-            <ImageView
-                android:layout_width="0sp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@null"
-                android:padding="8sp"
-                android:clickable="true"
-                android:id="@+id/btnEntregado"
-                android:src="@drawable/comprobado" />
-
-            <ImageView
-                android:layout_width="0sp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="8sp"
-                android:id="@+id/btnCancelar"
-                android:clickable="true"
-                android:src="@drawable/cancelar" />
-
-            <ImageView
-                android:layout_width="0sp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="8sp"
-                android:id="@+id/btnReagendar"
-                android:clickable="true"
-                android:src="@drawable/intercambiar" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:minHeight="70sp"
-        android:orientation="vertical"
-        android:padding="10sp">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Rutas Disponibles"
+            android:background="@android:color/white"
+            android:minHeight="70sp"
+            android:orientation="vertical"
+            android:padding="10sp">
 
-            android:textColor="@android:color/black"
-            android:textSize="20sp" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Spinner
-                android:id="@+id/spinnerRutas"
-                android:background="@drawable/spinner_out_line"
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="match_parent"
-                android:minHeight="40sp"
-                android:layout_toStartOf="@+id/btnMenu"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Rutas Disponibles"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
 
-            <ImageView
-                android:layout_width="40sp"
-                android:layout_height="40sp"
-                android:background="@null"
-                android:padding="8sp"
-                android:clickable="true"
-                android:layout_alignParentEnd="true"
-                android:id="@+id/btnMenu"
-                android:src="@drawable/menu" />
-        </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5sp">
 
-    </LinearLayout>
+                <Spinner
+                    android:id="@+id/spinnerRutas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@+id/btnMenu"
+                    android:background="@drawable/spinner_out_line"
+                    android:minHeight="40sp" />
+
+                <ImageView
+                    android:id="@+id/btnMenu"
+                    android:layout_width="50sp"
+                    android:layout_height="40sp"
+                    android:layout_alignParentEnd="true"
+                    android:background="@null"
+                    android:clickable="true"
+                    android:padding="2sp"
+                    android:src="@drawable/menu" />
+            </RelativeLayout>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 
 </RelativeLayout>

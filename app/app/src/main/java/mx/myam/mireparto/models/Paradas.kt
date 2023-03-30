@@ -10,8 +10,9 @@ data class Paradas (
     val latitud: Double,
     val longitud: Double,
     val comentarios: String,
-    val total: String,
     val cliente: String,
     var distance:Double,
-    var marker:Marker
+    var marker:Marker,
+    val feActualizacion: String,
+    var productos:List<ProductosParadas> = listOf()
 )

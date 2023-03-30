@@ -5,7 +5,11 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import mx.myam.mireparto.models.RepartidorGps
+import mx.myam.mireparto.service.Actions
 import mx.myam.mireparto.service.ClientService
+import mx.myam.mireparto.service.request.ActualizarEntregaRequest
+import mx.myam.mireparto.service.request.ParadasRequest
 import mx.myam.mireparto.service.response.ParadasResponse
 import mx.myam.mireparto.service.response.RutasResponse
 import okhttp3.RequestBody
@@ -17,7 +21,7 @@ class RutasController(val iRutasController: IRutasController) {
         iRutasController.isLoading(true)
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                val rutasResponse = ClientService.apiClient.getRutas().execute().body()
+                val rutasResponse = ClientService.apiClient.getRutas(1, Actions.GET_BY_REPARTIDOR).execute().body()
                 iRutasController.isLoading(false)
                 if (rutasResponse?.idEstatus == 1) {
                     iRutasController.onSuccesRutas(rutasResponse)
@@ -35,12 +39,13 @@ class RutasController(val iRutasController: IRutasController) {
 
     }
 
+
     @OptIn(DelicateCoroutinesApi::class)
     fun getParadas(idRuta:Int){
         iRutasController.isLoading(true)
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                val paradasResponse = ClientService.apiClient.getParadas(idRuta).execute().body()
+                val paradasResponse = ClientService.apiClient.getParadas(ParadasRequest(idRuta),Actions.GET_BY_RUTA).execute().body()
                 iRutasController.isLoading(false)
                 if (paradasResponse?.idEstatus == 1) {
                     iRutasController.onSuccesParadas(paradasResponse)
@@ -62,7 +67,8 @@ class RutasController(val iRutasController: IRutasController) {
         iRutasController.isLoading(true)
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                val actualizarEntregaResponse = ClientService.apiClient.actualizarEntrega(idParada, status,"actualizarRutas").execute().body()
+                val actualizarEntregaResponse = ClientService.apiClient.actualizarEntrega(
+                    ActualizarEntregaRequest(idParada,status,""),Actions.UPDATE_ENTREGA).execute().body()
                 iRutasController.isLoading(false)
                 if (actualizarEntregaResponse?.idEstatus == 1) {
                     iRutasController.onSuccesActualizarEntrega(idParada, status)
@@ -77,8 +83,28 @@ class RutasController(val iRutasController: IRutasController) {
                 iRutasController.onErrorActualizarEntrega(e.message.toString())
             }
         }
+    }
 
-
+    @OptIn(DelicateCoroutinesApi::class)
+    fun registerLocationUser(repartidorGps: RepartidorGps) {
+        //iRutasController.isLoading(true)
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val actualizarEntregaResponse = ClientService.apiClient.registerLocationUser(Actions.REGISTER_GPS,repartidorGps).execute().body()
+               // iRutasController.isLoading(false)
+                if (actualizarEntregaResponse?.idEstatus == 1) {
+                    iRutasController.onSuccesActualizarEntrega(1, 1)
+                } else {
+                    iRutasController.onErrorActualizarEntrega(
+                        actualizarEntregaResponse?.mensaje ?: "No fue posible obtener la información"
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+               // iRutasController.isLoading(false)
+                iRutasController.onErrorActualizarEntrega(e.message.toString())
+            }
+        }
     }
 
 }
