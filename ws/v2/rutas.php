@@ -8,43 +8,20 @@ if (isset($_GET['action'])) {
     $action = $_GET['action'];
     switch ($action) {
         case 'create':
-            if ($request == 'POST') {
-                //create
-                Create ($conn);
-            }else{
-                echo json_encode(array(
-                    'idEstatus' => -1,
-                    'data' => array(),
-                    'mensaje' => 'Bad request.'
-                ));
-            }
+            Create($conn);
             break;
         case 'update':
-            if ($request == 'POST') {
-                //update
-                Update($conn);
-            }else{
-                echo json_encode(array(
-                    'idEstatus' => -1,
-                    'data' => array(),
-                    'mensaje' => 'Bad request.'
-                ));
-            }
+            Update($conn);
             break;
         case 'delete':
-            if ($request == 'POST') {
-                Delete($conn);
-            }else{
-                echo json_encode(array(
-                    'idEstatus' => -1,
-                    'data' => array(),
-                    'mensaje' => 'Bad request.'
-                ));
-            }
+            Delete($conn);
             break;
 
         case 'getByRepartidor':
             GetByRepartidor($conn);
+            break;
+        case 'getCustomView':
+            getCustomView($conn);
             break;
         default:
         echo json_encode(array(
@@ -82,25 +59,82 @@ function index($conn){
     mysqli_close($conn);
 }
 
+function getCustomView($conn){
+    $sql = "SELECT * FROM rutas_view";
+    $result = mysqli_query($conn, $sql);
+    if (mysqli_num_rows($result) > 0) {
+        $rutas = array();
+        while ($row = mysqli_fetch_assoc($result)) {
+            $rutas[] = $row;
+        }
+        echo json_encode(array(
+            'idEstatus' => 1,
+            'data' => $rutas,
+            'mensaje' => 'OK'
+        ));
+    } else {
+        echo json_encode(array(
+            'idEstatus' => 0,
+            'data' => array(),
+            'mensaje' => 'No se encontraron rutas'
+        ));
+    }
+}
+
 function Create($conn){
+     //get values from json request body
+     $json = file_get_contents('php://input');
+     $obj = json_decode($json,true);
+ 
+     if($obj == null){
+         echo json_encode(array(
+             'idEstatus' => -1,
+             'data' => array(),
+             'mensaje' => 'Bad request.'
+         ));
+         return;
+     }
     //create
-    $idRuteo = $_POST['idRuteo'];
-    $fecha = $_POST['fecha'];
-    $Folio = $_POST['Folio'];
-    $idRepartidor = $_POST['idRepartidor'];
-    $idEstatus = $_POST['idEstatus'];
-    $feFin = $_POST['feFin'];
+    //$idRuteo = $obj['idRuteo'];
+    $fecha = $obj['fecha'];
+    $Folio = $obj['Folio'];
+    $idRepartidor = $obj['idRepartidor'];
+    $idEstatus = $obj['idEstatus'];
+    //$feFin = $obj['feFin'];
 
     //prevent sql injection
-    $idRuteo = mysqli_real_escape_string($conn, $idRuteo);
+    //$idRuteo = mysqli_real_escape_string($conn, $idRuteo);
     $fecha = mysqli_real_escape_string($conn, $fecha);
     $Folio = mysqli_real_escape_string($conn, $Folio);
     $idRepartidor = mysqli_real_escape_string($conn, $idRepartidor);
     $idEstatus = mysqli_real_escape_string($conn, $idEstatus);
-    $feFin = mysqli_real_escape_string($conn, $feFin);
+    //$feFin = mysqli_real_escape_string($conn, $feFin);
+    
+    $mgs = "";
+    if($fecha == ""){
+        $mgs = $mgs.($mgs == "" ? "":", ")."Fecha\n";
+    }
+    if($Folio == ""){
+        $mgs = $mgs.($mgs == "" ? "":", ")."Folio\n";
+    }
+    if($idRepartidor == "" || $idRepartidor == -1){
+        $mgs = $mgs.($mgs == "" ? "":", ")."Repartidor\n";
+    }
+    if($idEstatus == "" || $idEstatus == -1){
+        $mgs = $mgs.($mgs == "" ? "":", ")."Estatus\n";
+    }
 
+    if($mgs != ""){
+        $mgs = "Los siguientes campos son requeridos: \n".$mgs;
+        echo json_encode(array(
+            'idEstatus' => -1,
+            'data' => array(),
+            'mensaje' => $mgs
+        ));
+        return;
+    }
 
-    $sql = "INSERT INTO tbl_ruteo (fecha, Folio, idRepartidor, idEstatus, feFin) VALUES ('$fecha', '$Folio', '$idRepartidor', '$idEstatus', '$feFin')";
+    $sql = "INSERT INTO tbl_ruteo (fecha, Folio, idRepartidor, idEstatus) VALUES ('$fecha', '$Folio', '$idRepartidor', '$idEstatus')";
     $result = mysqli_query($conn, $sql);
 
     if ($result) {
