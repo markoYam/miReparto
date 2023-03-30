@@ -1,7 +1,7 @@
 //document ready
 $(document).ready(function () {
     searchRutas();
-    getEstatus();
+    //getEstatus();
 });
 
 function searchRutas() {

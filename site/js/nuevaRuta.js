@@ -1,7 +1,20 @@
 //document ready
 $(document).ready(function () {
     searchRepartidores();
-    getEstatus();
+    //getEstatus();
+    //set fecha actual formato yyyy/mm/dd
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+    var yyyy = today.getFullYear();
+    if (dd < 10) {
+        dd = '0' + dd
+    }
+    if (mm < 10) {
+        mm = '0' + mm
+    }
+    today = yyyy + '-' + mm + '-' + dd;
+    $("#fecha").val(today);
 });
 //search all repartidores
 function searchRepartidores() {

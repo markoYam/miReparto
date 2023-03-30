@@ -21,12 +21,12 @@
     <form id="nueva-ruta-form" method="post">
       <div class="form-group">
         <label for="fecha">Fecha:</label>
-        <input type="date" class="form-control" id="fecha" name="fecha" value="2021-05-01">
+        <input type="date" class="form-control" id="fecha" name="fecha">
       </div>
 
       <div class="form-group mt-2">
         <label for="Folio">Folio:</label>
-        <input type="text" class="form-control" id="Folio" name="Folio" value="1">
+        <input type="text" class="form-control" id="Folio" name="Folio">
       </div>
       <!--repartidor field select-->
       <div class="form-group mt-2">
