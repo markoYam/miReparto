@@ -1,29 +1,26 @@
-<!DOCTYPE html>
-<html>
+<?php
+require_once("templates/header.php");
+require_once("templates/sidebar.php");
 
-<head>
-  <title>Registro de Rutas</title>
-  <!-- Latest compiled and minified CSS -->
-  <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+$idRuteo = 0;
+if(isset($_GET["idRuteo"])){
+  $idRuteo = $_GET["idRuteo"];
+}
+echo "<script>var idRuteo = $idRuteo;</script>";
+?>
 
-  <!-- jQuery library -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<div id="layoutSidenav_content">
 
-  <!-- Latest compiled JavaScript -->
-  <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
-</head>
-
-<body>
   <div class="container">
-    <h2>Nueva Ruta</h2>
+    <h2><?php echo ($idRuteo == 0 ? 'Nueva':'Editar');?> Ruta</h2>
     <form id="nueva-ruta-form" method="post">
+
+      <!--id ruteo hidden field-->
+      <input type="hidden" id="idRuteo" name="idRuteo" value="<?php echo $idRuteo;?>">
       <div class="form-group">
         <label for="fecha">Fecha:</label>
         <input type="date" class="form-control" id="fecha" name="fecha">
-      </div>
-
+      </div>     
       <div class="form-group mt-2">
         <label for="Folio">Folio:</label>
         <input type="text" class="form-control" id="Folio" name="Folio">
@@ -48,11 +45,11 @@
     </form>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-    crossorigin="anonymous"></script>
+</div>
 
-  <script src="js/nuevaRuta.js"></script>
-</body>
+<?php
+require_once("templates/loadingUtils.php");
+require_once("templates/footer.php");
+?>
 
-</html>
+<script src="js/nuevaRuta.js"></script>

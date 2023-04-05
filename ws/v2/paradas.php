@@ -20,7 +20,7 @@ if (isset($_GET['action'])) {
             break;
 
         case 'create':
-            Create ($conn);
+            Create($conn);
             break;
 
         case 'update':
@@ -135,10 +135,57 @@ function getByRuta($conn){
     }
 
     $idRuta = $obj['idRuta'];
+
+    $queryText = '';
+    if(isset($obj['queryFiltro'])){
+        $queryText = $obj['queryFiltro'];
+        $queryText = mysqli_real_escape_string($conn, $queryText);
+    }
+    
+    //filters
+    $idEstatus = -1;
+    if(isset($obj['idEstatus'])){
+        $idEstatus = $obj['idEstatus'];
+        $idEstatus = mysqli_real_escape_string($conn, $idEstatus);
+    }
+
+    $fechaInicio = '';
+    if(isset($obj['fechaInicio'])){
+        $fechaInicio = $obj['fechaInicio'];
+        $fechaInicio = mysqli_real_escape_string($conn, $fechaInicio);
+    }
+
+    $fechaFin = '';
+    if(isset($obj['fechaFin'])){
+        $fechaFin = $obj['fechaFin'];
+        $fechaFin = mysqli_real_escape_string($conn, $fechaFin);
+    }
+
+
     //prevent sql injection
     $idRuta = mysqli_real_escape_string($conn, $idRuta);
 
-    $sql = "SELECT * FROM tbl_paradas WHERE idRuta = $idRuta";
+    $sql = "SELECT * FROM paradas_view WHERE idRuta = $idRuta";
+
+    if($queryText != ''){
+        $sql .= " AND (cliente LIKE '%$queryText%' OR comentarios LIKE '%$queryText%')";
+    }
+    if($idEstatus != -1){
+        $sql .= " AND idEstatus = $idEstatus";
+    }
+
+    if($fechaInicio != '' && $fechaFin != ''){
+        $sql .= " AND ( fecha BETWEEN '$fechaInicio' AND '$fechaFin' AND date(IFNULL(feActualizacion,'')) BETWEEN '$fechaInicio' AND '$fechaFin' )";
+    }
+
+    if($fechaInicio != '' && $fechaFin == ''){
+        $sql .= " AND (fecha = '$fechaInicio' OR date(IFNULL(feActualizacion,'')) = '$fechaInicio')";
+    }
+
+    if($fechaFin != '' && $fechaInicio == ''){
+        $sql .= " AND (fecha = '$fechaFin' OR date(IFNULL(feActualizacion,'')) = '$fechaFin')";
+    }
+    
     $result = $conn->query($sql);
     $data = array();
     if (mysqli_num_rows($result) > 0) {
@@ -164,7 +211,7 @@ function getByRuta($conn){
         echo json_encode(array(
             'idEstatus' => 1,
             'data' => $data,
-            'mensaje' => 'OK'
+            'mensaje' =>  'OK'
         ));
     }else{
         echo json_encode(array(
@@ -285,6 +332,52 @@ function Create($conn){
     $comentarios = $obj['comentarios'];
     $cliente = $obj['cliente'];
 
+    $productos = $obj['productos'];
+
+    //validate fiels
+    $errors = array();
+    if($idRuta == null){
+        $errors[] = 'idRuta';
+    }
+    if($fecha == null){
+        $errors[] = 'fecha';
+    }
+    if($idEstatus == null || $idEstatus == -1){
+        $errors[] = 'idEstatus';
+    }
+    if($latitud == null || $latitud == 0){
+        $errors[] = 'latitud';
+    }
+    if($longitud == null || $longitud == 0){
+        $errors[] = 'longitud';
+    }   
+    if($cliente == null || $cliente == ''){
+        $errors[] = 'cliente';
+    }
+    if($comentarios == null || $comentarios == '' || $comentarios == ' '){
+        $errors[] = 'comentarios';
+    }
+
+    if(count($errors) > 0){
+
+        $mgs = 'Los siguientes campos son requeridos: ';
+        foreach($errors as $error){
+            //if is last not ad comma
+            if($error == end($errors)){
+                $mgs .= $error;
+                break;
+            }else{
+                $mgs .= $error . ', ';
+            }
+        }
+        echo json_encode(array(
+            'idEstatus' => -1,
+            'data' => array(),
+            'mensaje' => $mgs
+        ));
+        return;
+    }
+
     //prevent sql injection
     $idRuta = mysqli_real_escape_string($conn, $idRuta);
     $fecha = mysqli_real_escape_string($conn, $fecha);
@@ -299,15 +392,34 @@ function Create($conn){
     $result = mysqli_query($conn, $sql);
 
     if ($result) {
+        $last_id = mysqli_insert_id($conn);
+
+        //foreach products
+        foreach($productos as $producto){
+            $idProducto = $producto['idProducto'];
+            $cantidad = $producto['dcCantidad'];
+            $sql_productos_paradas = "INSERT INTO tbl_productosparadas (idParada, idProducto, dcCantidad) VALUES ('$last_id', '$idProducto', '$cantidad')";
+            $result_productos_paradas = mysqli_query($conn, $sql_productos_paradas);
+
+            if(!$result_productos_paradas){
+                echo json_encode(array(
+                    'idEstatus' => 0,
+                    'data' => 1,
+                    'mensaje' => 'Error al crear la parada.'
+                ));
+                return;
+            }
+        }
+
         echo json_encode(array(
             'idEstatus' => 1,
-            'data' => array(),
+            'data' => $last_id,
             'mensaje' => 'Parada creada correctamente.'
         ));
     }else{
         echo json_encode(array(
             'idEstatus' => 0,
-            'data' => array(),
+            'data' => 1,
             'mensaje' => 'Error al crear la parada.'
         ));
     }

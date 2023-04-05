@@ -24,3 +24,8 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
 });
+
+//document ready
+$(document).ready(function () {
+    
+});
