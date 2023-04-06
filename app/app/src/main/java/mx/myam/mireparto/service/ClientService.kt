@@ -11,7 +11,7 @@ object ClientService {
     }
     val client = Retrofit.Builder()
         //.baseUrl("https://esmeraldamayoreo.000webhostapp.com/ws/") //prod
-        .baseUrl("http://192.168.1.100/miReparto/miReparto/ws/") //dev
+        .baseUrl("http://192.168.1.100/miReparto/miReparto/ws/v2/") //dev
         .addConverterFactory(GsonConverterFactory.create())
             //add interceptor all request
         .client(OkHttpClient.Builder().addInterceptor( interceptor ).build())

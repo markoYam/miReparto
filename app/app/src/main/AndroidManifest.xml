@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.MiReparto"
+        android:theme="@style/Theme.MiReparto.NoActionBar"
         tools:targetApi="31">
 
         <!--
@@ -37,7 +37,7 @@
             android:value="@string/api_key" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".views.MapsActivity"
             android:exported="true"
             android:label="@string/title_activity_maps">
             <intent-filter>

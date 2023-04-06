@@ -59,4 +59,5 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.5.0'
 
     implementation 'com.afollestad.material-dialogs:core:3.3.0'
+    implementation 'com.afollestad.material-dialogs:bottomsheets:3.2.1'
 }
