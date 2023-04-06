@@ -28,7 +28,7 @@ async function searchParadas() {
         data: JSON.stringify($data),
         contentType: "application/json",
         success: function (data) {
-            console.log(data);
+            //console.log(data);
             //fill table with data
             var table = $("#paradas-table");
             table.empty();
@@ -37,6 +37,7 @@ async function searchParadas() {
 
             if (data["idEstatus"] == 1) {
                 var paradas = data["data"];
+                lsParadas = paradas;
                 //show id="globalInfo"
                 $("#globalInfo").show();
 
@@ -99,6 +100,54 @@ async function searchParadas() {
             console.log(data);
            // $("#globalInfo").hide();
         }
+    });
+}
+
+var lsParadas = [];
+function deleteParada(idParada) {
+    var ruta = lsParadas.find(x => x.idParada == idParada);
+    var mgs = "¿Está seguro de eliminar la parada: #" + ruta.idParada + "?";
+    $("#idParadaDelete").val(idParada);
+    $("#message").html(mgs);
+    $("#modalDeleteParada").modal("show");
+
+    $("#btnDeleteParada").click(function () {
+        DeleteParadaWs();
+        //dismiss modal
+        $("#modalDeleteParada").modal("hide");
+    });
+}
+
+function DeleteParadaWs(){
+    let data = {
+        "idParada": $("#idParadaDelete").val()
+    }
+
+    let settings = {
+        "url": "../ws/v2/paradas.php?action=delete",
+        "method": "POST",
+        "timeout": 0,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "data": JSON.stringify(data),
+    };
+
+    showDialogLoading();
+
+    $.ajax(settings).done(function (response) {
+        hideDialogLoading();
+        //console.log(response);
+        if (response["idEstatus"] == 1) {
+            showDialogSuccess(response["mensaje"]);   
+            searchParadas();
+        } else {
+            showDialogError(response["mensaje"]);
+        }
+    }).fail(function (response) {
+        //console.log(response);
+        hideDialogLoading();
+        showDialogError("Error al eliminar la parada");
     });
 }
 

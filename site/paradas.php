@@ -127,7 +127,32 @@ if(isset($_GET['idRuteo'])){
 
     </div>
 
+    <!-- Modal delete -->
+    <div class="modal fade" id="modalDeleteParada" tabindex="-1" role="dialog" aria-labelledby="modalDeleteRutaTitle"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDeleteRutaTitle">Eliminar Parada</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="idParadaDelete">
+                    <p id="message">¿Está seguro de eliminar la parada?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btnDeleteParada" class="btn btn-primary">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php
+ require_once("templates/loadingUtils.php");
 require_once("templates/footer.php");
 ?>
     <script src="js/paradas.js"></script>

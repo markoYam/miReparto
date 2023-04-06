@@ -7,7 +7,7 @@ $(document).ready(function () {
     });
 });
 
-var lsRutas = [];
+var lsParadas = [];
 function searchRutas() {
 
     let query = $("#txt-search").val();
@@ -32,7 +32,7 @@ function searchRutas() {
         hideDialogLoading();
         if (response["idEstatus"] == 1) {
             var rutas = response["data"];
-            lsRutas = rutas;
+            lsParadas = rutas;
             for (var i = 0; i < rutas.length; i++) {
                 //actions edit/delete
                 var actionEditButton = "<a href='nuevaRuta.php?idRuteo=" + rutas[i]["idRuteo"] + "' class='btn btn-primary btn-xs'><i class='fa fa-pencil'></i></a>";
@@ -45,11 +45,12 @@ function searchRutas() {
                 var folio = "<td>" + rutas[i]["Folio"] + "</td>";
                 var repartidor = "<td>" + rutas[i]["nbRepartidor"] + "</td>";
                 var estatus = "<td>" + rutas[i]["nbEstatus"] + "</td>";
-                var paradas = "<td class='center'>" + actionParadas + "</td>";
-                var editar = "<td class='center'>" + actionEditButton + "</td>";
-                var eliminar = "<td class='center'>" + actionDeleteButton + "</td>";
+                var inventarioBtn = "<td class='text-center'><a href='javascript:showModalProductos(" + rutas[i]["idRuteo"] + ")' class='btn btn-info btn-xs'><i class='fa fa-list'></i></a></td>";
+                var paradas = "<td class='text-center'>" + actionParadas + "</td>";
+                var editar = "<td class='text-center'>" + actionEditButton + "</td>";
+                var eliminar = "<td class='text-center'>" + actionDeleteButton + "</td>";
 
-                table.append("<tr>" + idRuteo + fecha + folio + repartidor + estatus + paradas + editar + eliminar + "</tr>");
+                table.append("<tr>" + idRuteo + fecha + folio + repartidor + estatus + inventarioBtn + paradas + editar + eliminar + "</tr>");
             }
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -58,12 +59,59 @@ function searchRutas() {
     });
 }
 
+function showModalProductos(idRuteo) {
+    var data = {
+        "idRuteo": idRuteo,
+    }
+
+    let settings = {
+        "url": "../ws/v2/rutas.php?action=getInventarioRuta",
+        "method": "POST",
+        "timeout": 0,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "data": JSON.stringify(data),
+    };
+
+    let table = $("#tabla-productos");
+    table.empty();
+
+    $.ajax(settings).done(function (response) {
+
+        if(response["idEstatus"] == 1){
+            var lsProductos = response["data"];
+
+            for (var i = 0; i < lsProductos.length; i++) {
+               
+                var nbProducto = "<td>" + lsProductos[i]["nbProducto"] + "</td>";
+                var dcCantidad = "<td>" + lsProductos[i]["dcCantidad"] + "</td>";
+                var dcPrecioCompra = "<td>" + lsProductos[i]["dcPrecioCompra"] + "</td>";
+                var dcPrecioVenta = "<td>" + lsProductos[i]["dcPrecioVenta"] + "</td>";
+                var dcComision = "<td>" + lsProductos[i]["dcComision"] + "</td>";
+
+                table.append("<tr>" + nbProducto+dcCantidad+ dcPrecioCompra + dcPrecioVenta + dcComision + "</tr>");
+            }
+
+            $("#modal-productos").modal("show");
+        }else{
+            showDialogError("La ruta no tiene productos");
+        }
+       
+
+
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        hideDialogLoading();
+     showDialogError("La ruta no tiene productos");
+    });
+}
+
 function deleteRutaModal(idRuteo) {
     $("#idRuteoDelete").val(idRuteo);
     var folio = "";
-    for (var i = 0; i < lsRutas.length; i++) {
-        if (lsRutas[i]["idRuteo"] == idRuteo) {
-            folio = lsRutas[i]["Folio"];
+    for (var i = 0; i < lsParadas.length; i++) {
+        if (lsParadas[i]["idRuteo"] == idRuteo) {
+            folio = lsParadas[i]["Folio"];
         }
     }
 

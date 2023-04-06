@@ -26,6 +26,7 @@ require_once("templates/sidebar.php");
                     <th>Folio</th>
                     <th>Repartidor</th>
                     <th>Estatus</th>
+                    <th style="width: 5%;">Inventario</th>
                     <th style="width: 5%;">Paradas</th>
                     <th style="width: 5%;">Editar</th>
                     <th style="width: 5%;">Eliminar</th>
@@ -38,6 +39,44 @@ require_once("templates/sidebar.php");
     </div>
 
     <!-- Modal delete ruta-->
+    <div id="modal-productos" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <!-- Header del modal -->
+                <div class="modal-header">
+                    <h5 class="modal-title">Productos</h5>
+                    <!-- Botón para cerrar el modal usando bootstrap y automatico -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table mt-3">
+                        <thead>
+                            <tr>                           
+                                <th>Nombre</th>
+                                <th>Cantidad</th>
+                                <th>Precio Compra</th>
+                                <th>Precio Venta</th>
+                                <th>Comisión</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-productos">
+                            <!-- Filas de productos seleccionados y cantidad -->
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" id="guardar-cambios" class="btn btn-primary">Guardar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!--modal inventario-->
     <div class="modal fade" id="modalDeleteRuta" tabindex="-1" role="dialog" aria-labelledby="modalDeleteRutaTitle"
         aria-hidden="true">
         <div class="modal-dialog" role="document">

@@ -245,6 +245,21 @@ function Delete($conn){
 
     //prevent sql injection
     $idParada = mysqli_real_escape_string($conn, $idParada);
+    
+     //eliminar productos paradas si esta tiene
+    $sql = "DELETE FROM tbl_productosparadas WHERE idParada = $idParada";
+    
+    $result = mysqli_query($conn, $sql);
+    if (!$result) {
+        echo json_encode(array(
+            'idEstatus' => 1,
+            'data' => array(),
+            'mensaje' => 'No se pudo eliminar los productos de la parada.'
+        ));
+
+        return;
+    }
+
 
     $sql = "DELETE FROM tbl_paradas WHERE idParada = $idParada";
     $result = mysqli_query($conn, $sql);

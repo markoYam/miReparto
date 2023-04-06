@@ -25,6 +25,9 @@ if (isset($_GET['action'])) {
         case 'getById':
             getById($conn);
             break;
+        case 'getInventarioRuta':
+            getInventarioRuta($conn);
+            break;
         default:    
         echo json_encode(array(
             'idEstatus' => -1,
@@ -85,6 +88,55 @@ function getById($conn){
         echo json_encode(array(
             'idEstatus' => 1,
             'data' => $rutas[0],
+            'mensaje' => 'OK'
+        ));
+    } else {
+        echo json_encode(array(
+            'idEstatus' => 0,
+            'data' => array(),
+            'mensaje' => 'No se encontraron rutas'
+        ));
+    }
+}
+
+function getInventarioRuta($conn){
+    $json = file_get_contents('php://input');
+    $obj = json_decode($json,true);
+    if($obj == null){
+        echo json_encode(array(
+            'idEstatus' => -1,
+            'data' => array(),
+            'mensaje' => 'Bad request.'
+        ));
+        return;
+    }
+
+    $idRuteo = $obj['idRuteo'];
+    //prevent sql injection
+    $idRuteo = mysqli_real_escape_string($conn, $idRuteo);
+
+    $sql = "SELECT
+                nbProducto,
+                SUM( dcCantidad ) AS dcCantidad,
+                dcPrecioCompra,
+                dcPrecioVenta,
+                dcComision 
+            FROM
+                `productos_parada_view` 
+            WHERE
+                idRuta = $idRuteo 
+            GROUP BY
+                idProducto";
+    
+    $result = mysqli_query($conn, $sql);
+    if (mysqli_num_rows($result) > 0) {
+        $rutas = array();
+        while ($row = mysqli_fetch_assoc($result)) {
+            $rutas[] = $row;
+        }
+        echo json_encode(array(
+            'idEstatus' => 1,
+            'data' => $rutas,
             'mensaje' => 'OK'
         ));
     } else {
@@ -358,5 +410,3 @@ function Delete($conn){
 
     mysqli_close($conn);
 }
-
-?>
