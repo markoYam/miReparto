@@ -28,7 +28,6 @@ require_once("templates/sidebar.php");
                         <th>Referencia</th>
 
                         <th>Telefono</th>
-                        <th>Facebook</th>
                         <th>Mensaje</th>
                         <th style="width: 5%;">Editar</th>
                         <th style="width: 5%;">Eliminar</th>

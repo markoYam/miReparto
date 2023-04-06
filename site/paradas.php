@@ -8,6 +8,8 @@ $idRuta = 0;
 if(isset($_GET['idRuteo'])){
     $idRuta = $_GET['idRuteo'];
     echo "<script>var idRuteo = $idRuta;</script>";
+}else{
+    echo "<script>var idRuteo = 0;</script>";
 }
 
 ?>
@@ -67,7 +69,7 @@ if(isset($_GET['idRuteo'])){
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Estatus</th>
+                        <th style="width: 5%;">Estatus</th>
                         <th>Fecha</th>
                         <th>Cliente</th>
                         <th>N° productos</th>

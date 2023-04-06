@@ -7,6 +7,10 @@ $(document).ready(async function () {
     });
 });
 
+function convertToStringCurrency(number) {
+    return number.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+}
+
 var lsProductos = [];
 async function searchProductos() {
     try {
@@ -38,14 +42,20 @@ async function searchProductos() {
                     let table = $("#productos-table");
                     table.empty();
                     for (let i = 0; i < productos.length; i++) {
+
+                        
+                        let dcPrecioCompra_f = parseFloat(productos[i]["dcPrecioCompra"]);
+                        let dcPrecioVenta_f = parseFloat(productos[i]["dcPrecioVenta"]);
+                        let dcComision_f = parseFloat(productos[i]["dcComision"]);
+
                         let actionEditButton = "<a href='nuevoProducto.php?idProducto=" + productos[i]["idProducto"] + "' class='btn btn-primary btn-xs'><i class='fa fa-pencil'></i></a>";
                         let actionDeleteButton = "<a href='javascript:deleteProductoModal(" + productos[i]["idProducto"] + ")' class='btn btn-danger btn-xs'><i class='fa-solid fa-trash'></i></a>";
                         let idProducto = "<td>" + productos[i]["idProducto"] + "</td>";
                         let nombre = "<td>" + productos[i]["nbProducto"] + "</td>";
                         let descripcion = "<td>" + productos[i]["desProducto"] + "</td>";
-                        let dcPrecioCompra = "<td>" + productos[i]["dcPrecioCompra"] + "</td>";
-                        let dcPrecioVenta = "<td>" + productos[i]["dcPrecioVenta"] + "</td>";
-                        let dcComision = "<td>" + productos[i]["dcComision"] + "</td>";
+                        let dcPrecioCompra = "<td>$" + convertToStringCurrency(dcPrecioCompra_f) + "</td>";
+                        let dcPrecioVenta = "<td>$" + convertToStringCurrency(dcPrecioVenta_f) + "</td>";
+                        let dcComision = "<td>$" + convertToStringCurrency(dcComision_f) + "</td>";
                         //tallas modal
                         let tallasbtn = "<td> <a href='javascript:showModalTallas(" + productos[i]["idProducto"] + ")' class='btn btn-primary btn-xs'><i class='fa-solid fa-barcode'></i></a></td>";
                         //fotos modal
@@ -102,7 +112,7 @@ async function showModalFotos(idProducto) {
                 for (let i = 0; i < fotos.length; i++) {
                     let foto = fotos[i];
                     let item = $("<div class='carousel-item'></div>");
-                    let img = $("<img src='" + "../"+foto["desPathFoto"] + "' class='d-block w-100' alt='' style='height: 30rem;' >");
+                    let img = $("<img src='" + "../"+foto["desPathFoto"] + "' class='d-block w-100' alt='' style='height: 40rem;' >");
                     if (i == 0) {
                         item.addClass("active");
                     }

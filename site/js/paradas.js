@@ -28,7 +28,7 @@ async function searchParadas() {
         data: JSON.stringify($data),
         contentType: "application/json",
         success: function (data) {
-
+            console.log(data);
             //fill table with data
             var table = $("#paradas-table");
             table.empty();
@@ -52,17 +52,35 @@ async function searchParadas() {
                     dcComisionGlobal += parseFloat(paradas[i]["dcComision"]);
                     dcTotalGlobal += parseFloat(paradas[i]["dcTotal"]);
 
-                    var actionEditButton = "<td> <a href='nuevaParada.php?idParada=" + paradas[i]["idParada"] + "' class='btn btn-primary btn-xs'><i class='fa fa-pencil'></i></a></td>";
+                    let dcComision_f = parseFloat(paradas[i]["dcComision"]);
+                    let dcTotal_f = parseFloat(paradas[i]["dcTotal"]);
+                    let dcSubtotal_f = parseFloat(paradas[i]["dcSubtotal"]);
+
+                    var actionEditButton = "<td> <a href='nuevaParadas.php?idParada=" + paradas[i]["idParada"] +"&idRuteo="+idRuteo+ "' class='btn btn-primary btn-xs'><i class='fa fa-pencil'></i></a></td>";
                     var actionDeleteButton = "<td><a href='javascript:deleteParada(" + paradas[i]["idParada"] + ")' class='btn btn-danger btn-xs'><i class='fa-solid fa-trash'></i></a></td>";
                     var actionMapa = "<td><a href='javascript:openModalMaps(" + paradas[i]["idParada"] + "," + paradas[i]["latitud"] + "," + paradas[i]["longitud"] + ")' class='btn btn-success btn-xs'><i class='fa fa-map-marker'></i></a></td>";
                     var id = "<td>" + paradas[i]["idParada"] + "</td>";
                     var estatus = "<td>" + paradas[i]["nbEstatus"] + "</td>";
                     var folio = "<td>" + paradas[i]["fecha"] + "</td>";
-                    var dcSubTotal = "<td>" + paradas[i]["dcSubtotal"] + "</td>";
+                    var dcSubTotal = "<td>$" + convertToStringCurrency(dcSubtotal_f) + "</td>";
                     var numProductos = "<td>" + paradas[i]["numProductos"] + "</td>";
-                    var dcComision = "<td>" + paradas[i]["dcComision"] + "</td>";
-                    var dcTotal = "<td>" + paradas[i]["dcTotal"] + "</td>";
+                    var dcComision = "<td>$" + convertToStringCurrency(dcComision_f) + "</td>";
+                    var dcTotal = "<td>$" + convertToStringCurrency(dcTotal_f) + "</td>";
                     var cliente = "<td>" + paradas[i]["cliente"] + "</td>";
+
+                    //when status is ENTREGADO show circle with green color
+                    if (paradas[i]["idEstatus"] == 8) {
+                        estatus = "<td class='text-center'><i class='fa fa-circle' style='color: gray; font-size: 25px;'></i></td>";                       
+                    }
+
+                    if (paradas[i]["idEstatus"] == 9) {
+                        estatus = "<td class='text-center'><i class='fa fa-circle' style='color: green; font-size: 25px;'></i></td>";                       
+                    }
+                    //when status is 10 show circle with reed color
+                    if (paradas[i]["idEstatus"] == 10) {
+                        estatus = "<td class='text-center'><i class='fa fa-circle' style='color: red; font-size: 25px;'></i></td>";
+                    }
+
                     //var comentarios = "<td>" + paradas[i]["comentarios"] + "</td>";
                     var fechaActualizacion = "<td>" + (paradas[i]["feActualizacion"] == null ? '' : paradas[i]["feActualizacion"]) + "</td>";
                     table.append("<tr>" + id + estatus + folio + cliente + numProductos + dcSubTotal + dcComision + dcTotal  + fechaActualizacion + actionMapa + actionEditButton + actionDeleteButton + "</tr>");
@@ -70,11 +88,10 @@ async function searchParadas() {
                 }
 
                 //fill totals and mark as bold
-                $("#numProductosGlobal").html("Productos: <b>" + numProductosGlobal + "</b>");
-
-                $("#dcSubtotalGlobal").html("SubTotal: <b>$" + dcSubtotalGlobal + "</b>");
-                $("#dcComisionGlobal").html("Comisión: <b>$" + dcComisionGlobal + "</b>");
-                $("#dcTotalGlobal").html("Total: <b>$" + dcTotalGlobal + "</b>");
+                $("#numProductosGlobal").html("Productos: <b>" + convertToStringCurrency(numProductosGlobal) + "</b>");
+                $("#dcSubtotalGlobal").html("SubTotal: <b>$" + convertToStringCurrency(dcSubtotalGlobal) + "</b>");
+                $("#dcComisionGlobal").html("Comisión: <b>$" + convertToStringCurrency(dcComisionGlobal) + "</b>");
+                $("#dcTotalGlobal").html("Total: <b>$" + convertToStringCurrency(dcTotalGlobal) + "</b>");
 
             }
         },
@@ -85,6 +102,9 @@ async function searchParadas() {
     });
 }
 
+function convertToStringCurrency(number) {
+    return number.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+}
 async function getEstatus() {
 
     $data = {

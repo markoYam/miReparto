@@ -26,6 +26,9 @@ if (isset($_GET['action'])) {
         case 'update':
             Update($conn);
             break;
+        case 'getParadaById':
+            getParadaById($conn);
+            break;
         default:
         echo json_encode(array(
             'idEstatus' => -1,
@@ -161,11 +164,10 @@ function getByRuta($conn){
         $fechaFin = mysqli_real_escape_string($conn, $fechaFin);
     }
 
-
     //prevent sql injection
     $idRuta = mysqli_real_escape_string($conn, $idRuta);
 
-    $sql = "SELECT * FROM paradas_view WHERE idRuta = $idRuta";
+    $sql = "SELECT * FROM paradas_view WHERE idRuta like case when ($idRuta is null or $idRuta = '' or $idRuta = 0) then '%' else '$idRuta' end";
 
     if($queryText != ''){
         $sql .= " AND (cliente LIKE '%$queryText%' OR comentarios LIKE '%$queryText%')";
@@ -185,6 +187,8 @@ function getByRuta($conn){
     if($fechaFin != '' && $fechaInicio == ''){
         $sql .= " AND (fecha = '$fechaFin' OR date(IFNULL(feActualizacion,'')) = '$fechaFin')";
     }
+
+    $sql .= " ORDER BY 1 DESC";
     
     $result = $conn->query($sql);
     $data = array();
@@ -281,7 +285,8 @@ function Update($conn){
     $latitud = $obj['latitud'];
     $longitud = $obj['longitud'];
     $comentarios = $obj['comentarios'];
-    $cliente = $obj['cliente'];
+    $idCliente = $obj['idCliente'];
+    $nbCliente = $obj['nbCliente'];
 
     //prevent sql injection
     $idParada = mysqli_real_escape_string($conn, $idParada);
@@ -291,9 +296,39 @@ function Update($conn){
     $latitud = mysqli_real_escape_string($conn, $latitud);
     $longitud = mysqli_real_escape_string($conn, $longitud);
     $comentarios = mysqli_real_escape_string($conn, $comentarios);
-    $cliente = mysqli_real_escape_string($conn, $cliente);
+    $idCliente = mysqli_real_escape_string($conn, $idCliente);
+    $nbCliente = mysqli_real_escape_string($conn, $nbCliente);
 
-    $sql = "UPDATE tbl_paradas SET idRuta = '$idRuta', fecha = '$fecha', idEstatus = '$idEstatus', latitud = '$latitud', longitud = '$longitud', comentarios = '$comentarios', cliente = '$cliente' WHERE idParada = $idParada";
+    //delete productosParadas
+    $sql = "DELETE FROM tbl_productosparadas WHERE idParada = $idParada";
+
+    if (!mysqli_query($conn, $sql)) {
+        echo json_encode(array(
+            'idEstatus' => 0,
+            'data' => array(),
+            'mensaje' => 'Error al actualizar la parada.'
+        ));
+        return;
+    }
+
+    //insert productosParadas
+    $productos = $obj['productos'];
+    foreach($productos as $producto){
+        $idProducto = $producto['idProducto'];
+        $dcCantidad = $producto['dcCantidad'];
+        $sql = "INSERT INTO tbl_productosparadas (idParada, idProducto, dcCantidad) VALUES ($idParada, $idProducto, $dcCantidad)";
+        if (!mysqli_query($conn, $sql)) {
+            echo json_encode(array(
+                'idEstatus' => 0,
+                'data' => array(),
+                'mensaje' => 'Error al actualizar la parada.'
+            ));
+            return;
+        }
+    }
+
+    $sql = "UPDATE tbl_paradas SET idRuta = $idRuta, fecha = '$fecha', idEstatus = $idEstatus, latitud = '$latitud', longitud = '$longitud', comentarios = '$comentarios', idCliente = $idCliente, cliente = '$nbCliente' WHERE idParada = $idParada";
+    
     if (mysqli_query($conn, $sql)) {
         echo json_encode(array(
             'idEstatus' => 1,
@@ -309,6 +344,57 @@ function Update($conn){
     }
 }
 
+function getParadaById($conn){
+    $json = file_get_contents('php://input');
+     $obj = json_decode($json,true);
+ 
+     if($obj == null){
+         echo json_encode(array(
+             'idEstatus' => -1,
+             'data' => array(),
+             'mensaje' => 'Bad request.'
+         ));
+         return;
+     }
+    
+    $idParada = $obj['idParada'];
+
+    //prevent sql injection
+    $idParada = mysqli_real_escape_string($conn, $idParada);
+
+    $sql = "SELECT * FROM tbl_paradas WHERE idParada = $idParada";
+    $result = mysqli_query($conn, $sql);
+    if (mysqli_num_rows($result) > 0) {
+        $data = array();
+        while($row = mysqli_fetch_assoc($result)) {
+            $idParada = $row['idParada'];
+            $sqlProductos = "SELECT * FROM tbl_productosparadas pp INNER JOIN tbl_productos p on pp.idProducto = p.idProducto  WHERE idParada = $idParada";
+            $resultProductos = mysqli_query($conn, $sqlProductos);
+            if (mysqli_num_rows($resultProductos) > 0) {
+                $productos = array();
+                while($rowProductos = mysqli_fetch_assoc($resultProductos)) {
+                    $productos[] = $rowProductos;
+                }
+                $row['productos'] = $productos;
+
+            }else{
+                $row['productos'] = array();
+            }
+            $data[] = $row;
+        }
+        echo json_encode(array(
+            'idEstatus' => 1,
+            'data' => $data[0],
+            'mensaje' =>  'OK'
+        ));
+    }else{
+        echo json_encode(array(
+            'idEstatus' => 0,
+            'data' => array(),
+            'mensaje' => 'No hay paradas registradas.'
+        ));
+    }
+}
 function Create($conn){
      //get values from json request body
      $json = file_get_contents('php://input');
@@ -330,7 +416,8 @@ function Create($conn){
     $latitud = $obj['latitud'];
     $longitud = $obj['longitud'];
     $comentarios = $obj['comentarios'];
-    $cliente = $obj['cliente'];
+    $idCliente = $obj['idCliente'];
+    $nbCliente = $obj['nbCliente'];
 
     $productos = $obj['productos'];
 
@@ -351,9 +438,6 @@ function Create($conn){
     if($longitud == null || $longitud == 0){
         $errors[] = 'longitud';
     }   
-    if($cliente == null || $cliente == ''){
-        $errors[] = 'cliente';
-    }
     if($comentarios == null || $comentarios == '' || $comentarios == ' '){
         $errors[] = 'comentarios';
     }
@@ -385,9 +469,9 @@ function Create($conn){
     $latitud = mysqli_real_escape_string($conn, $latitud);
     $longitud = mysqli_real_escape_string($conn, $longitud);
     $comentarios = mysqli_real_escape_string($conn, $comentarios);
-    $cliente = mysqli_real_escape_string($conn, $cliente);
-
-    $sql = "INSERT INTO tbl_paradas (idRuta, fecha, idEstatus, latitud, longitud, comentarios, cliente) VALUES ('$idRuta', '$fecha', '$idEstatus', '$latitud', '$longitud', '$comentarios', '$cliente')";
+    $idCliente = mysqli_real_escape_string($conn, $idCliente);
+    $nbCliente = mysqli_real_escape_string($conn, $nbCliente);
+    $sql = "INSERT INTO tbl_paradas (idRuta, fecha, idEstatus, latitud, longitud, comentarios, idCliente, cliente) VALUES ('$idRuta', '$fecha', '$idEstatus', '$latitud', '$longitud', '$comentarios', '$idCliente', '$nbCliente')";
 
     $result = mysqli_query($conn, $sql);
 
@@ -425,4 +509,3 @@ function Create($conn){
     }
 
 }
-?>

@@ -40,16 +40,20 @@ $(document).ready(function () {
                         let desCalleTres = "<td>" + value["desCalleTres"] + "</td>";
                         let desReferencias = "<td>" + value["desReferencias"] + "</td>";
                         let numTelefono = "<td>" + value["numTelefono"] + "</td>";
-                        let urlFacebook = "<td>" + value["urlFacebook"] + "</td>";
+                        //let urlFacebook = "<td>" + value["urlFacebook"] + "</td>";
 
                         //let editar = "<td>"+"<a href='nuevoCliente.php?idCliente="+idCliente+"'>Editar</a>"+"</td>";
                         //let eliminar = "<td>"+"<a href='nuevoCliente.php?idCliente="+idCliente+"'>Eliminar</a>"+"</td>";
                         let editar = "<td> <a href='nuevoCliente.php?idCliente=" + value["idCliente"] + "' class='btn btn-primary btn-xs'><i class='fa fa-pencil'></i></a></td>";
                         let eliminar = "<td><a href='javascript:deleteParada(" + value["idCliente"] + ")' class='btn btn-danger btn-xs'><i class='fa-solid fa-trash'></i></a></td>";
-                        
-                        //abrir url en otra pestaña
-                        let abrirURl = "<td><a href='" + value["urlFacebook"] + "' target='_blank' class='btn btn-danger btn-xs'><i class='fa-solid fa-share'></i></a></td>";
-                        let tr = "<tr>" + idCliente + nbCliente + desCalleUno + desCalleDos + desCalleTres + desReferencias + numTelefono + urlFacebook +abrirURl+ editar + eliminar + "</tr>";
+
+                        //if urlFacebook is null, then don't show the button
+                        let abrirURl = "";
+                        if (value["urlFacebook"] != null && value["urlFacebook"] != "")
+                            abrirURl = "<td><a href='" + value["urlFacebook"] + "' target='_blank' class='btn btn-danger btn-xs'><i class='fa-solid fa-share'></i></a></td>";
+                        else
+                            abrirURl = "<td></td>";
+                        let tr = "<tr>" + idCliente + nbCliente + desCalleUno + desCalleDos + desCalleTres + desReferencias + numTelefono + abrirURl + editar + eliminar + "</tr>";
 
                         table.append(tr);
                     });
