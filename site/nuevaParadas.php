@@ -153,7 +153,5 @@ if (isset($_GET['idParada'])) {
     require_once("templates/loadingUtils.php");
     require_once("templates/footer.php");
     ?>
-
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLEdYk_QRPcaClwl1i6SXf54bTMZNK5mQ&libraries=places"></script>
     <script src="js/nuevaParada.js"></script>
     </body>
