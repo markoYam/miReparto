@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">miReparto</string>
     <string name="title_activity_maps">Mi Reparto</string>
-    <string name="api_key">AIzaSyDLEdYk_QRPcaClwl1i6SXf54bTMZNK5mQ</string>
+    <string name="api_key"></string>
 </resources>
