@@ -245,6 +245,8 @@ function Update($conn)
     $dcPrecioVenta = $obj['dcPrecioVenta'];
     $dcComision = $obj['dcComision'];
 
+   
+
     //prevent sql injection
     $nbProducto = mysqli_real_escape_string($conn, $nbProducto);
     $desProducto = mysqli_real_escape_string($conn, $desProducto);
@@ -254,7 +256,6 @@ function Update($conn)
     $dcPrecioVenta = mysqli_real_escape_string($conn, $dcPrecioVenta);
     $dcComision = mysqli_real_escape_string($conn, $dcComision);
 
-    $sql = "UPDATE tbl_productos SET nbProducto = '$nbProducto', desProducto = '$desProducto', idCategoria = $idCategoria, idEstatus = $idEstatus, dcPrecioCompra = $dcPrecioCompra, dcPrecioVenta = $dcPrecioVenta, dcComision = $dcComision WHERE idProducto = $idProducto";
 
     $fotosForm = $obj['fotos'];
     $tallasForm = $obj['tallas'];
@@ -341,6 +342,7 @@ function Update($conn)
         }
     }
 
+    $sql = "UPDATE tbl_productos SET nbProducto = '$nbProducto', desProducto = '$desProducto', idCategoria = $idCategoria, idEstatus = $idEstatus, dcPrecioCompra = $dcPrecioCompra, dcPrecioVenta = $dcPrecioVenta, dcComision = $dcComision WHERE idProducto = $idProducto";
 
     if (mysqli_query($conn, $sql)) {
         echo json_encode(array(
@@ -389,6 +391,40 @@ function Create($conn)
     $dcPrecioCompra = mysqli_real_escape_string($conn, $dcPrecioCompra);
     $dcPrecioVenta = mysqli_real_escape_string($conn, $dcPrecioVenta);
     $dcComision = mysqli_real_escape_string($conn, $dcComision);
+
+    if($dcPrecioCompra == null || $dcPrecioCompra == "" || $dcPrecioCompra <= 0){
+      echo json_encode(array(
+          'idEstatus' => 0,
+          'data' => array(),
+          'mensaje' => 'El precio de compra es requerido y debe ser mayor a 0.'
+      ));
+
+      return;
+    }
+
+    if($dcPrecioVenta == null || $dcPrecioVenta == "" || $dcPrecioVenta <= 0){
+      echo json_encode(array(
+          'idEstatus' => 0,
+          'data' => array(),
+          'mensaje' => 'El precio de venta es requerido y debe ser mayor a 0.'
+      ));
+
+      return;
+    }
+
+    if($dcPrecioCompra > $dcPrecioVenta){
+      echo json_encode(array(
+          'idEstatus' => 0,
+          'data' => array(),
+          'mensaje' => 'El precio de venta debe ser mayor al precio de compra.'
+      ));
+
+      return;
+    }
+
+    if($dcComision == null || $dcComision == "" || $dcComision <= 0){
+      $dcComision = 0;
+    }
 
     $sql = "INSERT INTO tbl_productos (nbProducto, desProducto, idCategoria, idEstatus, dcPrecioCompra, dcPrecioVenta, dcComision) VALUES ('$nbProducto', '$desProducto', $idCategoria, $idEstatus, $dcPrecioCompra, $dcPrecioVenta, $dcComision)";
 

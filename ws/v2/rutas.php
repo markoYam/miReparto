@@ -239,6 +239,18 @@ function Create($conn){
         return;
     }
 
+    //check if the folio already exists
+    $sql = "SELECT * FROM tbl_ruteo WHERE Folio = '$Folio'";
+    $result = mysqli_query($conn, $sql);
+    if (mysqli_num_rows($result) > 0) {
+        echo json_encode(array(
+            'idEstatus' => -1,
+            'data' => array(),
+            'mensaje' => 'Ya existe una ruta con el folio '.$Folio,
+        ));
+        return;
+    }
+
     $sql = "INSERT INTO tbl_ruteo (fecha, Folio, idRepartidor, idEstatus) VALUES ('$fecha', '$Folio', '$idRepartidor', '$idEstatus')";
     $result = mysqli_query($conn, $sql);
 
